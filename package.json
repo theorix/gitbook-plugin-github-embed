@@ -1,0 +1,23 @@
+{
+  "name": "gitbook-plugin-github-embed",
+  "description": "Embed github content",
+  "main": "./index.js",
+  "version": "1.0.0",
+  "engines": {
+    "gitbook": ">=3.0.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.7",
+    "github": "^8.2.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gitbook-tester": "^1.4.3",
+    "mocha": "^3.2.0"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -r ./test/_setup.js --slow 7000 --timeout 15000"
+  },
+  "author": "Jason Harwig. <jason.harwig@visallo.com>",
+  "license": "Apache-2.0"
+}
