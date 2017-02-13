@@ -26,23 +26,6 @@ module.exports = function urlMatcher(url) {
                     lines: [match[6], match[7]]
                 }
             }
-        },
-        {   // =>                             /
-            // https://github.com/:owner/:repo/:path
-            // https://github.com/:owner/:repo/:path#L12
-            // https://github.com/:owner/:repo/:path#L12-14
-            regex: regex('/'),
-            transform: function(match) {
-                return {
-                    request: {
-                        owner: match[1],
-                        repo: match[2],
-                        path: match[3]
-                    },
-                    extension: match[4] || '',
-                    lines: [match[5], match[6]]
-                }
-            }
         }
     ]
 
