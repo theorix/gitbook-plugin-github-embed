@@ -1,0 +1,9 @@
+.github-embed-caption {
+    margin-top: -1em;
+    text-align: center;
+    font-size: 90%;
+    font-style: italic;    
+}
+.github-embed-caption a {
+  text-decoration: none;
+}

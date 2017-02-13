@@ -1,13 +1,57 @@
-const tester = require('gitbook-tester');
+describe('integration', function() {
+    this.slow('10s');
+    this.timeout('15s')
 
-it('should embed url', () => {
-    return tester.builder()
-        .withLocalPlugin(require('path').join(__dirname, '..'))
-        .withContent('{% github_embed %}caption{% endgithub_embed %}')
-        .create()
-        .then(function(result) {
-            const { content } = result[0];
-            
-            content.should.equal('<p>Hello caption</p>')
-        })
+    const anchor = (lines, lineDesc) => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/v5analytics/gitbook-plugin-github-embed/blob/6bf0b7cb/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
+
+    it('should throw when no url', () => {
+        return render('{% github_embed %}{% endgithub_embed %}', '').should.be.rejected
+    })
+
+    it('should embed single line blob type url', function() {
+        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
+
+        return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
+            .should.eventually.equal(p(code('process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{', anchor('#L13', ' (line 13)'))))
+    })
+
+    it('should embed single line blob type url without indenting', function() {
+        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
+
+        // TODO: should also render link to source
+        return render(`{% github_embed "${blobUrl}", reindent=false %}{% endgithub_embed %}`)
+            .should.eventually.equal(p(code('            process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{', anchor('#L13', ' (line 13)'))))
+    })
+
+    it('should embed whole file blob type url', () => {
+        const blobUrl = repoUrl("blob/6bf0b7cb/index.js")
+
+        return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
+            .then(code => {
+                code.split(require('os').EOL).length.should.equal(38)
+            })
+            .should.eventually.be.fulfilled
+    })
+
+    it('should embed whole file blob type url no link', () => {
+        const blobUrl = repoUrl("blob/6bf0b7cb/index.js")
+
+        return render(`{% github_embed "${blobUrl}", showLink=false %}{% endgithub_embed %}`)
+            .then(code => {
+                code.split(require('os').EOL).length.should.equal(38)
+            })
+            .should.eventually.be.fulfilled
+    })
+
+    it('should embed multi line blob type url', () => {
+        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L12-L17")
+
+        return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
+            .should.eventually.equal(p(code(`github_embed: {
+    process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&apos;In block: &apos;</span>, blk);
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&apos;Hello &apos;</span> + blk.body;
+    }`, anchor('#L12-L17', ' (lines 12&#x2013;17)'))))
+    })
+
 })

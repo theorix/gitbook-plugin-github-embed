@@ -12,11 +12,15 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0",
     "gitbook-tester": "^1.4.3",
     "mocha": "^3.2.0"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -r ./test/_setup.js --slow 7000 --timeout 15000"
+    "test": "./node_modules/mocha/bin/mocha -r ./test/_setup.js"
   },
   "author": "Jason Harwig. <jason.harwig@visallo.com>",
   "license": "Apache-2.0"

@@ -1,38 +1,14 @@
-
 module.exports = {
-    hooks: {
-        'page:before': function(page) {
-            var options = this.options.pluginsConfig['github-embed'];
-            console.log('options=', options);
-            return page;
-        }
+    // Extend website resources and html
+    website: {
+        assets: "./book",
+        css: [
+            "github-embed.css"
+        ]
     },
-
     blocks: {
         github_embed: {
-            process: function(blk) {
-                console.log('In block: ', blk);
-                return 'Hello ' + blk.body;
-            }
+            process: require('./src/tag')
         }
     },
 };
-
-/*
-function connect() {
-    var GitHubApi = require('github');
-    var github = new GitHubApi({
-
-        // optional
-        debug: true,
-        protocol: 'https',
-        host: 'api.github.com',
-        headers: {
-            'user-agent': 'gitbook-plugin-github-embed'
-        },
-        Promise: require('bluebird'),
-        //followRedirects: false,
-        //timeout: 5000
-    });
-}
-*/
