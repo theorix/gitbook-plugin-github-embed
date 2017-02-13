@@ -8,6 +8,19 @@ Where `[github url]` is:
 
     https://github.com/[owner]/[repo]/blob/[ref]/[path]#[line numbers]
 
+Will produce something like this:
+
+```js
+website: {
+    assets: "./book",
+    css: [
+        "github-embed.css"
+    ]
+},
+```
+[index.js (lines 3–8)](https://github.com/v5analytics/gitbook-plugin-github-embed/blob/master/index.js#L3-L8")
+
+
 ## Examples
     
     // Load latest version of file "tag.js"   
@@ -32,6 +45,11 @@ Where `[github url]` is:
 * `reindent=true` Re-indent the lines given the line numbers. Defaults to `true`
 
         {% github_embed "[url]", reindent=false, showLink=false %}{% endgithub_embed %}
+
+
+## Styling the Link
+
+Use a gitbook style override to adjust the style of the link. The class is [`.github-embed-caption`](https://github.com/v5analytics/gitbook-plugin-github-embed/blob/master/book/github-embed.css).
 
 ## Avoiding Rate Limit Errors
 
