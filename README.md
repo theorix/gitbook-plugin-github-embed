@@ -8,7 +8,7 @@ Where `[github url]` is:
 
     https://github.com/[owner]/[repo]/blob/[ref]/[path]#[line numbers]
 
-Will produce something like this:
+Will produce something like this given the URL: https://github.com/v5analytics/gitbook-plugin-github-embed/blob/1cd16ac/index.js#L3-L8
 
 ```js
 website: {
