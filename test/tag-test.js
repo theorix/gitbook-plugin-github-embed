@@ -51,7 +51,17 @@ describe('integration', function() {
     process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{
         <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&apos;In block: &apos;</span>, blk);
         <span class="hljs-keyword">return</span> <span class="hljs-string">&apos;Hello &apos;</span> + blk.body;
-    }`, anchor('#L12-L17', ' (lines 12&#x2013;17)'))))
+    }
+}`, anchor('#L12-L17', ' (lines 12&#x2013;17)'))))
+    })
+
+    it('should embed multi line blob type url with blank lines', () => {
+        const blobUrl = repoUrl('blob/6bf0b7cb/index.js#L24-L27')
+        return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
+            .should.eventually.equal(p(code(`<span class="hljs-keyword">var</span> github = <span class="hljs-keyword">new</span> GitHubApi({
+
+    <span class="hljs-comment">// optional</span>
+    debug: <span class="hljs-literal">true</span>,`, anchor('#L24-L27', ' (lines 24&#x2013;27)'))))
     })
 
 })

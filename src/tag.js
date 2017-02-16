@@ -47,8 +47,8 @@ function extractSnippet(url, options) {
             if (lines && lines[0] !== undefined) {
                 const ln = contents.split(EOL);
                 const start = parseInt(lines[0], 10);
-                const end = lines[1] === undefined ? start + 1 : parseInt(lines[1], 10);
-                const contentsWithinLines = ln.slice(start - 1, end - 1).join(EOL);
+                const end = lines[1] === undefined ? start : parseInt(lines[1], 10);
+                const contentsWithinLines = ln.slice(start - 1, end).join(EOL);
 
                 return contentsWithinLines;
             }
