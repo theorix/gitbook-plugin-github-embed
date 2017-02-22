@@ -3,6 +3,8 @@ const { EOL } = require('os');
 const matcher = require('./url-matcher');
 const trimmer = require('./trimmer');
 const Promise = require('bluebird');
+const { Encoder } = require('node-html-encoder');
+const entityEncoder = new Encoder('entity');
 
 module.exports = function processGithubEmbed(block) {
     if (block.args.length !== 1) {
@@ -81,8 +83,7 @@ function extractSnippet(url, options) {
                 link = `<div class="github-embed-caption"><a title="Show Full Source of ${fileName}" href="${url}">${name}</a></div>`;
             }
 
-            return `<pre><code class="${language}">${trimmed}</code></pre>${link}`
+            return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
         })
         .catch(err => err.toString())
 }
-

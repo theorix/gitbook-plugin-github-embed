@@ -2,13 +2,14 @@
   "name": "gitbook-plugin-github-embed",
   "description": "Embed github content",
   "main": "./index.js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
     "gitbook": ">=3.0.0"
   },
   "dependencies": {
     "bluebird": "^3.4.7",
-    "github": "^8.2.1"
+    "github": "^8.2.1",
+    "node-html-encoder": "^0.0.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
