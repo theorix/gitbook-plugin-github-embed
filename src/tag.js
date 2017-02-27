@@ -60,7 +60,7 @@ function extractSnippet(url, options) {
             }
 
             if (options.hideLines) {
-                return require('./hidelines')(contents, options.hideLines);
+                return require('./hidelines')(contents, options.hideLines, 2);
             }
 
             return contents

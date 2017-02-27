@@ -2,7 +2,7 @@ describe('integration', function() {
     this.slow('10s');
     this.timeout('15s')
 
-    const anchor = (lines, lineDesc) => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/visallo/gitbook-plugin-github-embed/blob/6bf0b7cb/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
+    const anchor = (lines, lineDesc, blob='6bf0b7cb') => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/visallo/gitbook-plugin-github-embed/blob/${blob}/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
 
     it('should throw when no url', () => {
         return render('{% github_embed %}{% endgithub_embed %}', '').should.be.rejected
@@ -22,7 +22,7 @@ describe('integration', function() {
             .should.eventually.equal(p(code('            process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{', anchor('#L13', ' (line 13)'))))
     })
 
-    it('should embed whole file with hideLines', function() {
+    it('should embed partial file with hideLines', function() {
         const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L2-L19")
 
         return render(`{% github_embed "${blobUrl}", hideLines=['3-9'] %}{% endgithub_embed %}`)
@@ -38,6 +38,20 @@ describe('integration', function() {
         }
     },
 };`, anchor('#L2-L19', ' (lines 2&#x2013;19)'))))
+    })
+
+    it('should embed whole file with hideLines', function() {
+        const blobUrl = repoUrl("blob/709656a5/index.js")
+
+        return render(`{% github_embed "${blobUrl}", hideLines=['2-8'] %}{% endgithub_embed %}`)
+            .should.eventually.equal(p(code(`<span class="hljs-built_in">module</span>.exports = {
+    <span class="hljs-comment">// 7 lines hidden&#x2026;</span>
+    blocks: {
+        github_embed: {
+            process: <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./src/tag&apos;</span>)
+        }
+    },
+};`, anchor('', '', '709656a5'))))
     })
 
     it('should embed whole file blob type url', () => {
