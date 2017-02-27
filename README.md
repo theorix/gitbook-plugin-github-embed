@@ -45,7 +45,10 @@ website: {
 * `reindent=true` Re-indent the lines given the line numbers. Defaults to `true`
 
         {% github_embed "[url]", reindent=false, showLink=false %}{% endgithub_embed %}
+        
+* `hideLines=[]` Hide interior lines in a snippet. Should be in ascending order, can contain a range as a string.        
 
+        {% github_embed "[url]", hideLines=[2,'5-10'] %}{% endgithub_embed %}
 
 ## Styling the Link
 
