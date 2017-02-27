@@ -1,6 +1,6 @@
 const matcher = require('../src/url-matcher');
 const baseRequest = {
-    owner: 'v5analytics',
+    owner: 'visallo',
     repo: 'gitbook-plugin-github-embed'
 };
 

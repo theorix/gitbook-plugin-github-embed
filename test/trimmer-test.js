@@ -1,5 +1,5 @@
 
-const trimmer = require('../src/trimmer')
+const { trimmer } = require('../src/trimmer');
 
 describe('trimmer', () => {
 

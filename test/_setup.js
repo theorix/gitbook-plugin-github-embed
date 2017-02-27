@@ -8,7 +8,7 @@ chai.use(require('chai-as-promised'))
 global.Promise = require('bluebird')
 global.expect = expect;
 global.render = render;
-global.repoUrl = path => `https://github.com/v5analytics/gitbook-plugin-github-embed/${path}`
+global.repoUrl = path => `https://github.com/visallo/gitbook-plugin-github-embed/${path}`
 global.p = str => `<p>${str}</p>`
 global.code = (str, a) => `<pre><code class="lang-js">${str}</code></pre>${a || ''}`;
 

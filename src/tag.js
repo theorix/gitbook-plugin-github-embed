@@ -1,7 +1,7 @@
 const GitHubApi = require('github');
 const { EOL } = require('os');
 const matcher = require('./url-matcher');
-const trimmer = require('./trimmer');
+const { trimmer } = require('./trimmer');
 const Promise = require('bluebird');
 const { Encoder } = require('node-html-encoder');
 const entityEncoder = new Encoder('entity');
@@ -52,7 +52,15 @@ function extractSnippet(url, options) {
                 const end = lines[1] === undefined ? start : parseInt(lines[1], 10);
                 const contentsWithinLines = ln.slice(start - 1, end).join(EOL);
 
+                if (options.hideLines) {
+                    return require('./hidelines')(contentsWithinLines, options.hideLines, start + 1)
+                }
+
                 return contentsWithinLines;
+            }
+
+            if (options.hideLines) {
+                return require('./hidelines')(contents, options.hideLines);
             }
 
             return contents
