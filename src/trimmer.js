@@ -9,10 +9,12 @@ const api = {
         const match = src.match(WHITESPACE)
 
         var shortest = Number.MAX_VALUE
-        match.forEach(prefix => {
-            const len = prefix.length
-            shortest = Math.max(0, len < shortest ? len : shortest);
-        })
+        if (match) {
+            match.forEach(prefix => {
+                const len = prefix.length
+                shortest = Math.max(0, len < shortest ? len : shortest);
+            })
+        }
         return shortest;
     },
 

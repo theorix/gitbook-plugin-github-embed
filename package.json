@@ -1,8 +1,13 @@
 {
   "name": "gitbook-plugin-github-embed",
-  "description": "Embed github content",
+  "description": "Embed github code snippets into gitbook",
+  "homepage": "https://github.com/visallo/gitbook-plugin-github-embed",
+  "bugs": {
+    "url": "https://github.com/visallo/gitbook-plugin-github-embed/issues"
+  },
+  "repository": "visallo/gitbook-plugin-github-embed.git",
   "main": "./index.js",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "engines": {
     "gitbook": ">=3.0.0"
   },
@@ -23,6 +28,6 @@
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha -r ./test/_setup.js"
   },
-  "author": "Jason Harwig. <jason.harwig@visallo.com>",
+  "author": "Jason Harwig <jason.harwig@visallo.com>",
   "license": "Apache-2.0"
 }

@@ -36,6 +36,10 @@ website: {
     // Press "Y" key in github to switch from master/latest to last commit
     {% github_embed "https://github.com/v5analytics/gitbook-plugin-github-embed/blob/9ef6e532/src/tag.js#L1-L5" %}{% endgithub_embed %}
 
+    // Load full file, but hide interior lines
+    {% github_embed "https://github.com/v5analytics/gitbook-plugin-github-embed/blob/9ef6e532/src/tag.js", hideLines=['15-87'] %}{% endgithub_embed %}
+
+
 ## Options
 
 * `showLink=true` Show a link below the embedded source back to the source file. Defaults to `true`
@@ -48,7 +52,7 @@ website: {
         
 * `hideLines=[]` Hide interior lines in a snippet. Should be in ascending order, can contain a range as a string.        
 
-        {% github_embed "[url]", hideLines=[2,'5-10'] %}{% endgithub_embed %}
+        {% github_embed "[url]", hideLines=[2, '4', '7-10'] %}{% endgithub_embed %}
 
 ## Styling the Link
 

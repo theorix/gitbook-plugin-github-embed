@@ -16,13 +16,16 @@ const changeOffset = (offset, hideLines) => {
     })
 }
 
-module.exports = function hideLines(content, hidden, offset) {
+module.exports = function hideLines(content, _hidden, offset) {
+    var hidden = _hidden.map(h => String(h))
     var lines = content.split(EOL)
+
     if (offset) {
         hidden = changeOffset(offset - 1, hidden);
     }
+
     hidden.reverse().forEach(remove => {
-        var match = remove.match(regex);
+        var match = String(remove).match(regex);
         if (match) {
             const start = parseInt(match[1], 10);
             const len = match[2] ? (parseInt(match[2], 10) - start + 1) : 1;

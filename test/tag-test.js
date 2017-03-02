@@ -1,6 +1,6 @@
 describe('integration', function() {
-    this.slow('10s');
-    this.timeout('15s')
+    this.slow('15s');
+    this.timeout('20s')
 
     const anchor = (lines, lineDesc, blob='6bf0b7cb') => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/visallo/gitbook-plugin-github-embed/blob/${blob}/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
 

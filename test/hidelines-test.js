@@ -55,4 +55,17 @@ function() {
 }
 `)
     })
+
+    it('should accept numbers/strings', () => {
+        hideLines(template, [4, '6', '8-18'], 4).should.equal(`
+// line hidden…
+function() {
+// line hidden…
+    this.x = function() {
+    // 11 lines hidden…
+    }
+
+}
+`)
+    })
 })
