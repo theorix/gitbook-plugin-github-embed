@@ -1,3 +1,6 @@
+[![npm version](https://badge.fury.io/js/gitbook-plugin-github-embed.svg)](https://badge.fury.io/js/gitbook-plugin-github-embed)
+[![Build Status](https://travis-ci.org/visallo/gitbook-plugin-github-embed.svg?branch=master)](https://travis-ci.org/visallo/gitbook-plugin-github-embed)
+
 # Embed Github Snippets into Gitbooks
 
 Embed snippet text or whole files from Github repos into a GitBook.
