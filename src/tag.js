@@ -92,6 +92,5 @@ function extractSnippet(url, options) {
             }
 
             return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
-        })
-        .catch(err => err.toString())
+        });
 }
