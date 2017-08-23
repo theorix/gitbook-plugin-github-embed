@@ -7,6 +7,7 @@ const { Encoder } = require('node-html-encoder');
 const entityEncoder = new Encoder('entity');
 
 module.exports = function processGithubEmbed(block) {
+    console.log('processGithubEmbed');
     if (block.args.length !== 1) {
         throw Error('Required url parameter')
     }
@@ -15,6 +16,7 @@ module.exports = function processGithubEmbed(block) {
 }
 
 function setupGithub() {
+    console.log('setupGithub');
     var api = new GitHubApi({
         protocol: 'https',
         host: 'api.github.com',
@@ -31,6 +33,7 @@ function setupGithub() {
 }
 
 function extractSnippet(url, options) {
+    console.log('extractSnippet');
     const github = setupGithub();
     const { request, lines, extension } = matcher(url)
     var fileName;
@@ -90,7 +93,7 @@ function extractSnippet(url, options) {
 
                 link = `<div class="github-embed-caption"><a title="Show Full Source of ${fileName}" href="${url}">${name}</a></div>`;
             }
-
+            console.log('ABOUT TO RETURN ');
             return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
         });
 }
