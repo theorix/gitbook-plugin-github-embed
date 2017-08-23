@@ -2,28 +2,28 @@ describe('integration', function() {
     this.slow('15s');
     this.timeout('20s')
 
-    const anchor = (lines, lineDesc, blob='6bf0b7cb') => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/visallo/gitbook-plugin-github-embed/blob/${blob}/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
+    var anchor = (lines, lineDesc, blob='6bf0b7cb') => `<div class="github-embed-caption"><a title="Show Full Source of index.js" href="https://github.com/visallo/gitbook-plugin-github-embed/blob/${blob}/index.js${lines || ''}" target="_blank">index.js${lineDesc}</a></div>`;
 
     it('should throw when no url', () => {
         return render('{% github_embed %}{% endgithub_embed %}', '').should.be.rejected
     })
 
     it('should embed single line blob type url', function() {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
 
         return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code('process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{', anchor('#L13', ' (line 13)'))))
     })
 
     it('should embed single line blob type url without indenting', function() {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js#L13")
 
         return render(`{% github_embed "${blobUrl}", reindent=false %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code('            process: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">blk</span>) </span>{', anchor('#L13', ' (line 13)'))))
     })
 
     it('should embed partial file with hideLines', function() {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L2-L19")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js#L2-L19")
 
         return render(`{% github_embed "${blobUrl}", hideLines=['3-9'] %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code(`<span class="hljs-built_in">module</span>.exports = {
@@ -41,7 +41,7 @@ describe('integration', function() {
     })
 
     it('should embed whole file with hideLines', function() {
-        const blobUrl = repoUrl("blob/709656a5/index.js")
+        var blobUrl = repoUrl("blob/709656a5/index.js")
 
         return render(`{% github_embed "${blobUrl}", hideLines=['2-8'] %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code(`<span class="hljs-built_in">module</span>.exports = {
@@ -55,7 +55,7 @@ describe('integration', function() {
     })
 
     it('should embed whole file blob type url', () => {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js")
 
         return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
             .then(code => {
@@ -65,7 +65,7 @@ describe('integration', function() {
     })
 
     it('should embed whole file blob type url no link', () => {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js")
 
         return render(`{% github_embed "${blobUrl}", showLink=false %}{% endgithub_embed %}`)
             .then(code => {
@@ -75,7 +75,7 @@ describe('integration', function() {
     })
 
     it('should embed multi line blob type url', () => {
-        const blobUrl = repoUrl("blob/6bf0b7cb/index.js#L12-L17")
+        var blobUrl = repoUrl("blob/6bf0b7cb/index.js#L12-L17")
 
         return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code(`github_embed: {
@@ -87,7 +87,7 @@ describe('integration', function() {
     })
 
     it('should embed multi line blob type url with blank lines', () => {
-        const blobUrl = repoUrl('blob/6bf0b7cb/index.js#L24-L27')
+        var blobUrl = repoUrl('blob/6bf0b7cb/index.js#L24-L27')
         return render(`{% github_embed "${blobUrl}" %}{% endgithub_embed %}`)
             .should.eventually.equal(p(code(`<span class="hljs-keyword">var</span> github = <span class="hljs-keyword">new</span> GitHubApi({
 

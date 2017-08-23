@@ -1,7 +1,7 @@
-const chai = require('chai')
-const { expect } = chai;
-const should = chai.should()
-const tester = require('gitbook-tester');
+var chai = require('chai')
+var { expect } = chai;
+var should = chai.should()
+var tester = require('gitbook-tester');
 
 chai.use(require('chai-as-promised'))
 
@@ -18,7 +18,7 @@ function render(input) {
         .withContent(input)
         .create()
         .then(function(result) {
-            const { content } = result[0];
+            var { content } = result[0];
             return content
         })
 }

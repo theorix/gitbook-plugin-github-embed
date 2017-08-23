@@ -1,17 +1,17 @@
-const GitHubApi = require('github');
-const { EOL } = require('os');
-const matcher = require('./url-matcher');
-const { trimmer } = require('./trimmer');
-const Promise = require('bluebird');
-const { Encoder } = require('node-html-encoder');
-const entityEncoder = new Encoder('entity');
+var GitHubApi = require('github');
+var { EOL } = require('os');
+var matcher = require('./url-matcher');
+var { trimmer } = require('./trimmer');
+var Promise = require('bluebird');
+var { Encoder } = require('node-html-encoder');
+var entityEncoder = new Encoder('entity');
 
 module.exports = function processGithubEmbed(block) {
     console.log('processGithubEmbed');
     if (block.args.length !== 1) {
         throw Error('Required url parameter')
     }
-    const url = block.args[0];
+    var url = block.args[0];
     return extractSnippet(url, block.kwargs || {})
 }
 
@@ -34,8 +34,8 @@ function setupGithub() {
 
 function extractSnippet(url, options) {
     console.log('extractSnippet');
-    const github = setupGithub();
-    const { request, lines, extension } = matcher(url)
+    var github = setupGithub();
+    var { request, lines, extension } = matcher(url)
     var fileName;
 
     return Promise.try(() => github.repos.getContent(request))
@@ -47,13 +47,13 @@ function extractSnippet(url, options) {
 
             fileName = result.name;
 
-            const contents = Buffer.from(result.content, 'base64').toString()
+            var contents = Buffer.from(result.content, 'base64').toString()
 
             if (lines && lines[0] !== undefined) {
-                const ln = contents.split(EOL);
-                const start = parseInt(lines[0], 10);
-                const end = lines[1] === undefined ? start : parseInt(lines[1], 10);
-                const contentsWithinLines = ln.slice(start - 1, end).join(EOL);
+                var ln = contents.split(EOL);
+                var start = parseInt(lines[0], 10);
+                var end = lines[1] === undefined ? start : parseInt(lines[1], 10);
+                var contentsWithinLines = ln.slice(start - 1, end).join(EOL);
 
                 if (options.hideLines) {
                     return require('./hidelines')(contentsWithinLines, options.hideLines, start + 1)

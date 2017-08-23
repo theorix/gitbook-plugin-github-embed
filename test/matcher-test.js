@@ -1,5 +1,5 @@
-const matcher = require('../src/url-matcher');
-const baseRequest = {
+var matcher = require('../src/url-matcher');
+var baseRequest = {
     owner: 'visallo',
     repo: 'gitbook-plugin-github-embed'
 };

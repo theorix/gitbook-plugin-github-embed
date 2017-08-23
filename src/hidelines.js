@@ -1,14 +1,14 @@
-const { EOL } = require('os');
-const { shortest } = require('./trimmer')
+var { EOL } = require('os');
+var { shortest } = require('./trimmer')
 
-const regex = /^(\d+)(?:-(\d+))?$/
+var regex = /^(\d+)(?:-(\d+))?$/
 
-const changeOffset = (offset, hideLines) => {
+var changeOffset = (offset, hideLines) => {
     return hideLines.map(h => {
         return h.replace(regex, function(m, s, e) {
-            const offsetStart = parseInt(s, 10) - offset;
+            var offsetStart = parseInt(s, 10) - offset;
             if (e) {
-                const offsetEnd = parseInt(e, 10) - offset;
+                var offsetEnd = parseInt(e, 10) - offset;
                 return offsetStart + '-' + offsetEnd;
             }
             return offsetStart;
@@ -27,10 +27,10 @@ module.exports = function hideLines(content, _hidden, offset) {
     hidden.reverse().forEach(remove => {
         var match = String(remove).match(regex);
         if (match) {
-            const start = parseInt(match[1], 10);
-            const len = match[2] ? (parseInt(match[2], 10) - start + 1) : 1;
-            const removed = lines.splice(start, len)
-            const whitespace = shortest(removed.join(EOL))
+            var start = parseInt(match[1], 10);
+            var len = match[2] ? (parseInt(match[2], 10) - start + 1) : 1;
+            var removed = lines.splice(start, len)
+            var whitespace = shortest(removed.join(EOL))
             var tab = '';
             if (whitespace !== Number.MAX_VALUE && whitespace > 0) {
                 for (var i = 0; i < whitespace; i++) tab += ' ';

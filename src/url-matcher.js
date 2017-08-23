@@ -1,15 +1,15 @@
 
 module.exports = function urlMatcher(url) {
     console.log('urlMatcher');
-    const regexPrefix = '^https?://github\\.com/([^\/]+)/([^\/]+)';
-    const path = '(.+?(?:\\.([^#.]+))?)';
-    const lines = '(?:[#]L(\\d+)(?:-L(\\d+))?)?$';
-    const regex = middle => {
-        const r = `${regexPrefix}${middle || ''}${path}${lines}`;
+    var regexPrefix = '^https?://github\\.com/([^\/]+)/([^\/]+)';
+    var path = '(.+?(?:\\.([^#.]+))?)';
+    var lines = '(?:[#]L(\\d+)(?:-L(\\d+))?)?$';
+    var regex = middle => {
+        var r = `${regexPrefix}${middle || ''}${path}${lines}`;
         return new RegExp(r, 'i');
     }
 
-    const types = [
+    var types = [
         {   // =>                             /blob/... /
             // https://github.com/:owner/:repo/blob/:ref/:path
             // https://github.com/:owner/:repo/blob/:ref/:path#L12
@@ -31,8 +31,8 @@ module.exports = function urlMatcher(url) {
     ]
 
     for (var i = 0; i < types.length; i++) {
-        const type = types[i];
-        const match = url.match(type.regex)
+        var type = types[i];
+        var match = url.match(type.regex)
         if (match) {
             return type.transform(match)
         }

@@ -1,12 +1,12 @@
-const hideLines = require('../src/hidelines');
+var hideLines = require('../src/hidelines');
 
-const template = `
+var template = `
 var x = {};
 function() {
 
     this.x = function() {
-        const y = 2;
-        const x = 3;
+        var y = 2;
+        var x = 3;
         return x + y;
     }
 

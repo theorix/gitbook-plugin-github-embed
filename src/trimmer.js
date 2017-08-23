@@ -1,18 +1,18 @@
-const { EOL } = require('os');
-const WHITESPACE = /^[^\S\n]*(?=[\S]+)/mg;
+var { EOL } = require('os');
+var WHITESPACE = /^[^\S\n]*(?=[\S]+)/mg;
 
-const api = {
+var api = {
     shortest: function(src) {
         console.log('shortest');
         // Any content line has no prefix whitespace, do nothing
         if (src.match(/^[\S]/mg)) return src;
 
-        const match = src.match(WHITESPACE)
+        var match = src.match(WHITESPACE)
 
         var shortest = Number.MAX_VALUE
         if (match) {
             match.forEach(prefix => {
-                const len = prefix.length
+                var len = prefix.length
                 shortest = Math.max(0, len < shortest ? len : shortest);
             })
         }
@@ -21,11 +21,11 @@ const api = {
 
     trimmer: function(src) {
         console.log('trimmer');
-        const shortest = api.shortest(src);
+        var shortest = api.shortest(src);
 
         if (shortest !== Number.MAX_VALUE && shortest > 0) {
-            const shorten = new RegExp('^\\s{' + shortest + '}', '')
-            const reindented = src.replace(WHITESPACE, prefix => {
+            var shorten = new RegExp('^\\s{' + shortest + '}', '')
+            var reindented = src.replace(WHITESPACE, prefix => {
                 return prefix.replace(shorten, '')
             })
 
