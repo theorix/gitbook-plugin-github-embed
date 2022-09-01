@@ -79,6 +79,9 @@ function extractSnippet(url, options) {
 
             if (extension) {
                 language = 'lang-' + extension
+                if (extension == 'vue'){
+                    language = 'lang-js'
+                }
             }
 
             if (options.showLink !== false) {
