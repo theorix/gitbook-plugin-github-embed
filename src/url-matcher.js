@@ -1,6 +1,5 @@
 
 module.exports = function urlMatcher(url) {
-    console.log('urlMatcher');
     var regexPrefix = '^https?://github\\.com/([^\/]+)/([^\/]+)';
     var path = '(.+?(?:\\.([^#.]+))?)';
     var lines = '(?:[#]L(\\d+)(?:-L(\\d+))?)?$';

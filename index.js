@@ -7,8 +7,12 @@ module.exports = {
         ]
     },
     blocks: {
-        github_embed: {
+        lanying_code_snippet: {
             process: require('./src/tag')
         }
+    },
+    hooks: {
+        init: require('./src/init'),
+        "page:before": require('./src/page')
     },
 };

@@ -5,98 +5,86 @@ var { trimmer } = require('./trimmer');
 var Promise = require('bluebird');
 var { Encoder } = require('node-html-encoder');
 var entityEncoder = new Encoder('entity');
+var exec = require("child_process").execSync
+var repoCache = {}
 
 module.exports = function processGithubEmbed(block) {
-    console.log('processGithubEmbed');
-    if (block.args.length !== 1) {
-        throw Error('Required url parameter')
-    }
-    var url = block.args[0];
-    return extractSnippet(url, block.kwargs || {})
+    const pluginOptions = this.config.get('pluginsConfig')['github-embed']
+    var options = block.kwargs || {}
+    console.log("extractCodeSnippet:", options)
+    return extractCodeSnippet({...pluginOptions, ...options})
 }
 
-function setupGithub() {
-    console.log('setupGithub');
-    var api = new GitHubApi({
-        protocol: 'https',
-        host: 'api.github.com',
-        headers: {
-            'user-agent': 'gitbook-plugin-github-embed'
-        },
-        Promise: require('bluebird')
-    });
-    var token = process.env['GITBOOK_EMBED_GITHUB_API_TOKEN'] || process.env['GITHUB_API_TOKEN'];
-    if (token) {
-        api.authenticate({ type: 'oauth', token: token });
-    }
-    return api;
+function extractCodeSnippet(options) {
+    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function}` 
+    var result = exec(cmd).toString().trim()
+    var lines = result.split('\n')
+    var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"
+    var fieldDelimiter = "__LANYING_CODE_SNAPPET_FIELD_DELIMITER__"
+    var html = ''
+    var lineCache = {}
+
+    lines.forEach(line => {
+        var fields = line.split(fieldDelimiter)
+        if (fields.length == 6 && fields[0] == "CodeSnippet"){
+            var fileName = fields[1]
+            var line = fields[2]
+            var code = fields[3].replaceAll(lineDelimiter, '\n').replace(/^({)/, '').replace(/^(\n)/, '').replace(/(})$/, '')
+            var repoPath = fields[4]
+            var blockLine = fields[5]
+            //("str1,str2,str3,str4".match(/,/g) || []).length
+            //console.log("Got:", fileName, line, code, repoPath, blockLine)
+            var head = repoCache[options.repo]
+            if (!head) {
+                var getHeadCmd = `cd ${repoPath} && git rev-parse HEAD`
+                var getHeadResult = exec(getHeadCmd).toString().trim()
+                head = getHeadResult.split('\n')[0]
+                repoCache[options.repo] = head
+            }
+            if (!lineCache[`${fileName}|${line}`]) {
+                html += transformCodeSnippet(options, fileName, line, code, head, blockLine)
+                lineCache[`${fileName}|${line}`] = true
+            }
+        }
+    })
+    return html
 }
 
-function extractSnippet(url, options) {
-    console.log('extractSnippet');
-    var github = setupGithub();
-    var { request, lines, extension } = matcher(url)
-    var fileName;
+function transformCodeSnippet(options, fileName, line,  code, head, blockLine) {
+    var trimmed = code.replace(/[\s\n\r]*$/g, '')
+    var language = '';
+    var link = ''
+    var repoList = options['repositories'] || []
+    var repoUrl = ''
+    repoList.forEach(repo => {
+        if (repo.name == options.repo){
+            repoUrl = repo.url
+        }
+    })
 
-    return Promise.try(() => github.repos.getContent(request))
-        .then(function(result) {
-            if (result.type !== 'file') throw Error('Resource is not a file')
-            if (result.size === 0) throw Error('Resource is empty')
-            if (result.size >= 1024 * 1024) throw Error('Resource is too large to embed')
-            if (!result.content) throw Error('No content available')
+    var url = ''
+    if (repoUrl.startsWith("git@")) {
+        url = repoUrl.replaceAll(':', '/').replaceAll('git@', 'https://').replaceAll('.git', '')
+    } else {
+        url = repoUrl.replaceAll('.git', '')
+    }
+    url = `${url}/blob/${head}/${fileName}#L${line}`
 
-            fileName = result.name;
+    if (options.reindent !== false) {
+        trimmed = trimmer(trimmed)
+    }
 
-            var contents = Buffer.from(result.content, 'base64').toString()
+    var extension = fileName.split('.').pop();
+    if (extension) {
+        if (extension == 'vue'){
+            language = 'lang-js'
+        } else {
+            language = 'lang-' + extension
+        }
+    }
 
-            if (lines && lines[0] !== undefined) {
-                var ln = contents.split(EOL);
-                var start = parseInt(lines[0], 10);
-                var end = lines[1] === undefined ? start : parseInt(lines[1], 10);
-                var contentsWithinLines = ln.slice(start - 1, end).join(EOL);
-
-                if (options.hideLines) {
-                    return require('./hidelines')(contentsWithinLines, options.hideLines, start + 1)
-                }
-
-                return contentsWithinLines;
-            }
-
-            if (options.hideLines) {
-                return require('./hidelines')(contents, options.hideLines, 2);
-            }
-
-            return contents
-        })
-        .then(code => {
-            var trimmed = code.replace(/[\s\n\r]*$/g, '')
-            var language = '';
-            var link = ''
-
-            if (options.reindent !== false) {
-                trimmed = trimmer(trimmed)
-            }
-
-            if (extension) {
-                language = 'lang-' + extension
-                if (extension == 'vue'){
-                    language = 'lang-js'
-                }
-            }
-
-            if (options.showLink !== false) {
-                let name = fileName;
-                if (lines[0] !== undefined) {
-                    if (lines[1] === undefined) {
-                        name += ` (line ${lines[0]})`
-                    } else {
-                        name += ` (lines ${lines[0]}–${lines[1]})`
-                    }
-                }
-
-                link = `<div class="github-embed-caption"><a title="Show Full Source of ${fileName}" href="${url}">${name}</a></div>`;
-            }
-            console.log('ABOUT TO RETURN ');
-            return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
-        });
+    if (options.showLink !== false) {
+        link = `<div class="github-embed-caption"><a title="Show Full Source of ${fileName}" href="${url}">Github Source: ${fileName} (line ${line})</a></div>`;
+    }
+    return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
 }
