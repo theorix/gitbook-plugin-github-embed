@@ -11,10 +11,24 @@ var repoCache = {}
 module.exports = function processGithubEmbed(block) {
     const pluginOptions = this.config.get('pluginsConfig')['github-embed']
     var options = block.kwargs || {}
+    if(!repoIsExist(options, pluginOptions)){
+        console.log("repo not found, so skip:", options.repo)
+        return "";
+    }
     console.log("extractCodeSnippet:", options)
     return extractCodeSnippet({...pluginOptions, ...options})
 }
 
+function repoIsExist(options, pluginOptions) {
+    var repoList = pluginOptions['repositories'] || []
+    var hasRepo = false
+    repoList.forEach(repo => {
+        if (repo.name == options.repo){
+            hasRepo = true
+        }
+    })
+    return hasRepo
+}
 function extractCodeSnippet(options) {
     var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function}` 
     var result = exec(cmd).toString().trim()
@@ -26,14 +40,12 @@ function extractCodeSnippet(options) {
 
     lines.forEach(line => {
         var fields = line.split(fieldDelimiter)
-        if (fields.length == 6 && fields[0] == "CodeSnippet"){
+        if (fields.length == 5 && fields[0] == "CodeSnippet"){
             var fileName = fields[1]
             var line = fields[2]
             var code = fields[3].replaceAll(lineDelimiter, '\n').replace(/^({)/, '').replace(/^(\n)/, '').replace(/(})$/, '')
             var repoPath = fields[4]
-            var blockLine = fields[5]
-            //("str1,str2,str3,str4".match(/,/g) || []).length
-            //console.log("Got:", fileName, line, code, repoPath, blockLine)
+            console.log("Got:", fileName, line, code, repoPath)
             var head = repoCache[options.repo]
             if (!head) {
                 var getHeadCmd = `cd ${repoPath} && git rev-parse HEAD`
@@ -42,7 +54,7 @@ function extractCodeSnippet(options) {
                 repoCache[options.repo] = head
             }
             if (!lineCache[`${fileName}|${line}`]) {
-                html += transformCodeSnippet(options, fileName, line, code, head, blockLine)
+                html += transformCodeSnippet(options, fileName, line, code, head)
                 lineCache[`${fileName}|${line}`] = true
             }
         }
@@ -50,7 +62,7 @@ function extractCodeSnippet(options) {
     return html
 }
 
-function transformCodeSnippet(options, fileName, line,  code, head, blockLine) {
+function transformCodeSnippet(options, fileName, line,  code, head) {
     var trimmed = code.replace(/[\s\n\r]*$/g, '')
     var language = '';
     var link = ''
