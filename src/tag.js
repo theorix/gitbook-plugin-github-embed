@@ -90,6 +90,8 @@ function transformCodeSnippet(options, fileName, line,  code, head) {
     if (extension) {
         if (extension == 'vue'){
             language = 'lang-js'
+        } else if (extension == 'cc'){
+            language = 'lang-c'
         } else {
             language = 'lang-' + extension
         }
