@@ -12,7 +12,7 @@ module.exports = function processGithubEmbed(block) {
     const pluginOptions = this.config.get('pluginsConfig')['github-embed']
     var options = block.kwargs || {}
     if(!repoIsExist(options, pluginOptions)){
-        console.log("repo not found, so skip:", options.repo)
+        console.log(`repo ${options.repo} not found, so skip.`)
         return "";
     }
     console.log("extractCodeSnippet:", options)
@@ -30,7 +30,7 @@ function repoIsExist(options, pluginOptions) {
     return hasRepo
 }
 function extractCodeSnippet(options) {
-    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function}` 
+    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function},maxLine=${options.maxLine || 20}`
     var result = exec(cmd).toString().trim()
     var lines = result.split('\n')
     var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"

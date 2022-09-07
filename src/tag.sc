@@ -5,23 +5,19 @@ import scala.io.Source
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.language.postfixOps
-@main def exec(repo: String, className: String, functionName: String) = {
+@main def exec(repo: String, className: String, functionName: String, maxLine: String) = {
    workspace.openProject(repo)
    var language = cpg.metaData.language.toList(0)
    if (language ==  "JAVASRC") {
       var rule = ".*%s[.:->]*%s[(:]+.*".format(className, functionName)
       cpg.call.methodFullName(rule).foreach(r => {
          var filename = r.inAst.isMethod.toList(0).filename
-         var lineNumber = r.lineNumber.get
+         var lineNumber = r.lineNumber
          var repoPath = project.projectFile.inputPath
          var method = r.inAst.isMethod.toList(0)
-         var lineStart = method.lineNumber.get
-         var lineEnd = method.lineNumberEnd.get
-         if (lineEnd > lineNumber + 10) {
-            lineEnd = lineNumber + 10
-         }
-         val lines = Source.fromFile(filename).getLines()
-         var code = lines.slice(lineStart-1,lineEnd).mkString("\n")
+         var lineStart = method.lineNumber
+         var lineEnd = method.lineNumberEnd
+         var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
          printResult(filename, lineNumber, code, repoPath)
       })
    } else if (language == "NEWC") {
@@ -29,16 +25,12 @@ import scala.language.postfixOps
          var rule = "^%s$".format(functionName)
          cpg.call.methodFullName(rule).foreach(r => {
             var filename = r.inAst.isMethod.toList(0).filename
-            var lineNumber = r.lineNumber.get
+            var lineNumber = r.lineNumber
             var repoPath = project.projectFile.inputPath
             var method = r.inAst.isMethod.toList(0)
-            var lineStart = method.lineNumber.get
-            var lineEnd = method.lineNumberEnd.get
-            if (lineEnd > lineNumber + 10) {
-               lineEnd = lineNumber + 10
-            }
-            val lines = Source.fromFile(filename).getLines()
-            var code = lines.slice(lineStart-1,lineEnd).mkString("\n")
+            var lineStart = method.lineNumber
+            var lineEnd = method.lineNumberEnd
+            var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
             printResult(filename, lineNumber, code, repoPath)
          })
       } else {//C++ function with class
@@ -47,16 +39,12 @@ import scala.language.postfixOps
             var myClassName = findClass(r.astChildren.toList(0).astChildren.toList(0))
             if (myClassName == className || myClassName == "ANY") {
                var filename = r.inAst.isMethod.toList(0).filename
-               var lineNumber = r.lineNumber.get
+               var lineNumber = r.lineNumber
                var repoPath = project.projectFile.inputPath
                var method = r.inAst.isMethod.toList(0)
-               var lineStart = method.lineNumber.get
-               var lineEnd = method.lineNumberEnd.get
-               if (lineEnd > lineNumber + 10) {
-                  lineEnd = lineNumber + 10
-               }
-               val lines = Source.fromFile(filename).getLines()
-               var code = lines.slice(lineStart-1,lineEnd).mkString("\n")
+               var lineStart = method.lineNumber
+               var lineEnd = method.lineNumberEnd
+               var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
                printResult(filename, lineNumber, code, repoPath)
             }
          })
@@ -65,9 +53,10 @@ import scala.language.postfixOps
       var rule = ".*%s[.:->]*%s[(:]+.*".format(className, functionName)
       cpg.call.code(rule).foreach(r => {
           var filename = r.inAst.isMethod.toList(0).filename
-          var lineNumber = r.lineNumber.get
+          var lineNumber = r.lineNumber
           var repoPath = project.projectFile.inputPath
           var code = r.inAst.isBlock.toList(0).code
+          //var startLineNumber = r.inAst.isBlock.toList(0).lineNumber.get
           printResult(filename, lineNumber, code, repoPath)
       })
    }
@@ -116,7 +105,7 @@ def findPointerClass(classStr: String) : String = {
    }
    return "<CLASS_NOT_FOUND>"
 }
-def printResult(filename: String, lineNumber: Integer, code: String, repoPath: String) = {
+def printResult(filename: String, lineNumber: Option[Integer], code: String, repoPath: String) = {
    var relativeFilename = filename
    if(filename.startsWith(repoPath)){
       relativeFilename = filename.substring(repoPath.length()+1)
@@ -125,7 +114,27 @@ def printResult(filename: String, lineNumber: Integer, code: String, repoPath: S
    var fieldDelimiter = "__LANYING_CODE_SNAPPET_FIELD_DELIMITER__"
    printf("CodeSnippet%s%s%s%d%s%s%s%s\n",
       fieldDelimiter, relativeFilename,
-      fieldDelimiter, lineNumber,
+      fieldDelimiter, lineNumber.get,
       fieldDelimiter, code.replaceAll("\n",lineDelimiter),
       fieldDelimiter, repoPath)
+}
+
+def getFileLines(filename: String, lineStart: Option[Integer], lineEnd: Option[Integer], lineNumber: Option[Integer], maxLine: String): String = {
+   var lineNumberInt = lineNumber.get
+   var lineStartInt = lineStart.get
+   var lineEndInt = lineStartInt
+   var maxLineInt = maxLine.toInt
+   if (lineEnd.isDefined){
+      lineEndInt = lineEnd.get
+   }
+   if (lineEndInt - lineStartInt + 1 > maxLineInt) {
+      if (lineStartInt < lineNumberInt - maxLineInt / 2) {
+         lineStartInt = lineNumberInt - maxLineInt / 2
+      }
+      if (lineEndInt > lineStartInt + maxLineInt - 1) {
+         lineEndInt = lineStartInt + maxLineInt - 1
+      }
+   }
+   val lines = Source.fromFile(filename).getLines()
+   return lines.slice(lineStartInt-1,lineEndInt).mkString("\n")
 }
