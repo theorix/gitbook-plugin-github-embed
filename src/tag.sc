@@ -5,9 +5,11 @@ import scala.io.Source
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.language.postfixOps
-@main def exec(repo: String, className: String, functionName: String, maxLine: String) = {
+@main def exec(repo: String, className: String, functionName: String, maxLine: String, maxCount: String) = {
    workspace.openProject(repo)
    var language = cpg.metaData.language.toList(0)
+   var codeCount = 0
+   var maxCountInt = maxCount.toInt
    if (language ==  "JAVASRC") {
       var rule = ".*%s[.:->]*%s[(:]+.*".format(className, functionName)
       cpg.call.methodFullName(rule).foreach(r => {
@@ -18,7 +20,8 @@ import scala.language.postfixOps
          var lineStart = method.lineNumber
          var lineEnd = method.lineNumberEnd
          var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-         printResult(filename, lineNumber, code, repoPath)
+         codeCount += 1
+         if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
       })
    } else if (language == "NEWC") {
       if (className == ""){//C++ global function
@@ -31,7 +34,8 @@ import scala.language.postfixOps
             var lineStart = method.lineNumber
             var lineEnd = method.lineNumberEnd
             var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-            printResult(filename, lineNumber, code, repoPath)
+            codeCount += 1
+            if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
          })
       } else {//C++ function with class
          var rule = ".*[.:->]+%s$".format(functionName)
@@ -45,7 +49,8 @@ import scala.language.postfixOps
                var lineStart = method.lineNumber
                var lineEnd = method.lineNumberEnd
                var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-               printResult(filename, lineNumber, code, repoPath)
+               codeCount += 1
+               if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
             }
          })
       }
@@ -57,7 +62,8 @@ import scala.language.postfixOps
           var repoPath = project.projectFile.inputPath
           var code = r.inAst.isBlock.toList(0).code
           //var startLineNumber = r.inAst.isBlock.toList(0).lineNumber.get
-          printResult(filename, lineNumber, code, repoPath)
+         codeCount += 1
+         if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
       })
    }
 }

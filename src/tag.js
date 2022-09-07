@@ -30,7 +30,7 @@ function repoIsExist(options, pluginOptions) {
     return hasRepo
 }
 function extractCodeSnippet(options) {
-    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function},maxLine=${options.maxLine || 20}`
+    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function},maxLine=${options.maxLine || 20},maxCount=${options.maxCount || 10}`
     var result = exec(cmd).toString().trim()
     var lines = result.split('\n')
     var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"
