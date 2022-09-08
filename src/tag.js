@@ -36,7 +36,7 @@ function extractCodeSnippet(options) {
     var child = repoCache[options.repo]
     if (!child){
         var cmd = "joern"
-        child = spawn(cmd, ["--script","node_modules/gitbook-plugin-github-embed/src/tag.sc","--params",`repo=${options.repo}`],{detached: true, shell: true})
+        child = spawn(cmd, ["--script",`${process.cwd()}/node_modules/gitbook-plugin-github-embed/src/tag.sc`,"--params",`repo=${options.repo}`],{detached: true, shell: true, cwd: "/tmp"})
         repoCache[options.repo] = child
     }
     var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"

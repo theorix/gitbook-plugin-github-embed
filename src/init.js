@@ -13,8 +13,8 @@ module.exports = function init() {
     repoList.forEach(
         repo => {
             if (!repoCache[repo.name]){
-                var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/init.sc --params name=${repo.name},url=${repo.url},branch=${repo.branch}` 
-                var result = exec(cmd).toString().trim()
+                var cmd = `joern --script ${process.cwd()}/node_modules/gitbook-plugin-github-embed/src/init.sc --params name=${repo.name},url=${repo.url},branch=${repo.branch}` 
+                var result = exec(cmd, {cwd: "/tmp"}).toString().trim()
                 repoCache[repo.name] = repo
             }
         }
