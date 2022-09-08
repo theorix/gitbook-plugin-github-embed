@@ -5,8 +5,18 @@ import scala.io.Source
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.language.postfixOps
-@main def exec(repo: String, className: String, functionName: String, maxLine: String, maxCount: String) = {
+@main def exec(repo: String) = {
    workspace.openProject(repo)
+   for (ln <- Source.stdin.getLines) {
+      var fields = ln.split(" ")
+      if (fields(0) == "ExtractCode") {
+         extractCode(fields(1),fields(2),fields(3),fields(4))
+         printf("ExtractCodeFinish")
+      }
+   }
+}
+
+def extractCode(className: String, functionName: String, maxLine: String, maxCount: String) = {
    var language = cpg.metaData.language.toList(0)
    var codeCount = 0
    var maxCountInt = maxCount.toInt
@@ -55,7 +65,7 @@ import scala.language.postfixOps
          })
       }
    } else { // javascript
-      var rule = ".*%s[.:->]*%s[(:]+.*".format(className, functionName)
+      var rule = "[^\\n=]*%s[.:->]*%s[(:]+.*".format(className, functionName)
       cpg.call.code(rule).foreach(r => {
           var filename = r.inAst.isMethod.toList(0).filename
           var lineNumber = r.lineNumber

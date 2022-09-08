@@ -5,8 +5,11 @@ var { trimmer } = require('./trimmer');
 var Promise = require('bluebird');
 var { Encoder } = require('node-html-encoder');
 var entityEncoder = new Encoder('entity');
+const {spawn} = require('child_process');
 var exec = require("child_process").execSync
+var repoHeadCache = {}
 var repoCache = {}
+var deasync = require('deasync');
 
 module.exports = function processGithubEmbed(block) {
     const pluginOptions = this.config.get('pluginsConfig')['github-embed']
@@ -15,7 +18,7 @@ module.exports = function processGithubEmbed(block) {
         console.log(`repo ${options.repo} not found, so skip.`)
         return "";
     }
-    console.log("extractCodeSnippet:", options)
+    //console.log("extractCodeSnippet:", options)
     return extractCodeSnippet({...pluginOptions, ...options})
 }
 
@@ -30,35 +33,50 @@ function repoIsExist(options, pluginOptions) {
     return hasRepo
 }
 function extractCodeSnippet(options) {
-    var cmd = `joern --script node_modules/gitbook-plugin-github-embed/src/tag.sc --params repo=${options.repo},className=${options.class},functionName=${options.function},maxLine=${options.maxLine || 20},maxCount=${options.maxCount || 10}`
-    var result = exec(cmd).toString().trim()
-    var lines = result.split('\n')
+    var child = repoCache[options.repo]
+    if (!child){
+        var cmd = "joern"
+        child = spawn(cmd, ["--script","node_modules/gitbook-plugin-github-embed/src/tag.sc","--params",`repo=${options.repo}`],{detached: true, shell: true})
+        repoCache[options.repo] = child
+    }
     var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"
     var fieldDelimiter = "__LANYING_CODE_SNAPPET_FIELD_DELIMITER__"
     var html = ''
     var lineCache = {}
+    var isFinish = false
 
-    lines.forEach(line => {
-        var fields = line.split(fieldDelimiter)
-        if (fields.length == 5 && fields[0] == "CodeSnippet"){
-            var fileName = fields[1]
-            var line = fields[2]
-            var code = fields[3].replaceAll(lineDelimiter, '\n').replace(/^({)/, '').replace(/^(\n)/, '').replace(/(})$/, '')
-            var repoPath = fields[4]
-            console.log("Got:", fileName, line, code, repoPath)
-            var head = repoCache[options.repo]
-            if (!head) {
-                var getHeadCmd = `cd ${repoPath} && git rev-parse HEAD`
-                var getHeadResult = exec(getHeadCmd).toString().trim()
-                head = getHeadResult.split('\n')[0]
-                repoCache[options.repo] = head
+    child.stdin.setEncoding('utf-8');
+    child.stdin.write(`ExtractCode ${options.class} ${options.function} ${options.maxLine || 20} ${options.maxCount || 10}\r\n`)
+    child.stdout.on('data', data => {
+        lines = data.toString().trim().split('\n')
+        lines.forEach(line => {
+            //console.log("line:", line)
+            var fields = line.split(fieldDelimiter)
+            if (fields.length == 5 && fields[0] == "CodeSnippet"){
+                var fileName = fields[1]
+                var line = fields[2]
+                var code = fields[3].replaceAll(lineDelimiter, '\n').replace(/^({)/, '').replace(/^(\n)/, '').replace(/(})$/, '')
+                var repoPath = fields[4]
+                //console.log("Got:", fileName, line, code, repoPath)
+                var head = repoHeadCache[options.repo]
+                if (!head) {
+                    var getHeadCmd = `cd ${repoPath} && git rev-parse HEAD`
+                    var getHeadResult = exec(getHeadCmd).toString().trim()
+                    head = getHeadResult.split('\n')[0]
+                    repoHeadCache[options.repo] = head
+                }
+                if (!lineCache[`${fileName}|${line}`]) {
+                    html += transformCodeSnippet(options, fileName, line, code, head)
+                    lineCache[`${fileName}|${line}`] = true
+                }
+            }else if(fields.length >= 1 && fields[0] == "ExtractCodeFinish"){
+                isFinish = true
             }
-            if (!lineCache[`${fileName}|${line}`]) {
-                html += transformCodeSnippet(options, fileName, line, code, head)
-                lineCache[`${fileName}|${line}`] = true
-            }
-        }
+        })
     })
+    while(!isFinish){
+        deasync.runLoopOnce();
+    }
     return html
 }
 
