@@ -3,7 +3,7 @@ module.exports = {
     website: {
         assets: "./book",
         css: [
-            "github-embed.css"
+            "lanying-code-snippet.css"
         ]
     },
     blocks: {

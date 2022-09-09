@@ -1,8 +1,6 @@
 var GitHubApi = require('github');
 var { EOL } = require('os');
-var matcher = require('./url-matcher');
 var { trimmer } = require('./trimmer');
-var Promise = require('bluebird');
 var { Encoder } = require('node-html-encoder');
 var entityEncoder = new Encoder('entity');
 const {spawn} = require('child_process');
@@ -12,13 +10,12 @@ var repoCache = {}
 var deasync = require('deasync');
 
 module.exports = function processGithubEmbed(block) {
-    const pluginOptions = this.config.get('pluginsConfig')['github-embed']
+    const pluginOptions = this.config.get('pluginsConfig')['lanying-code-snippet']
     var options = block.kwargs || {}
     if(!repoIsExist(options, pluginOptions)){
         console.log(`repo ${options.repo} not found, so skip.`)
         return "";
     }
-    //console.log("extractCodeSnippet:", options)
     return extractCodeSnippet({...pluginOptions, ...options})
 }
 
@@ -36,7 +33,7 @@ function extractCodeSnippet(options) {
     var child = repoCache[options.repo]
     if (!child){
         var cmd = "joern"
-        child = spawn(cmd, ["--script",`${process.cwd()}/node_modules/gitbook-plugin-github-embed/src/tag.sc`,"--params",`repo=${options.repo}`],{detached: true, shell: true, cwd: "/tmp"})
+        child = spawn(cmd, ["--script",`${process.cwd()}/node_modules/gitbook-plugin-lanying-code-snippet/src/tag.sc`,"--params",`repo=${options.repo}`],{detached: true, shell: true, cwd: "/tmp"})
         repoCache[options.repo] = child
     }
     var lineDelimiter = "__LANYING_CODE_SNAPPET_LINE_DELIMITER__"
@@ -50,14 +47,12 @@ function extractCodeSnippet(options) {
     child.stdout.on('data', data => {
         lines = data.toString().trim().split('\n')
         lines.forEach(line => {
-            //console.log("line:", line)
             var fields = line.split(fieldDelimiter)
             if (fields.length == 5 && fields[0] == "CodeSnippet"){
                 var fileName = fields[1]
                 var line = fields[2]
                 var code = fields[3].replaceAll(lineDelimiter, '\n').replace(/^({)/, '').replace(/^(\n)/, '').replace(/(})$/, '')
                 var repoPath = fields[4]
-                //console.log("Got:", fileName, line, code, repoPath)
                 var head = repoHeadCache[options.repo]
                 if (!head) {
                     var getHeadCmd = `cd ${repoPath} && git rev-parse HEAD`
@@ -116,7 +111,7 @@ function transformCodeSnippet(options, fileName, line,  code, head) {
     }
 
     if (options.showLink !== false) {
-        link = `<div class="github-embed-caption"><a title="Show Full Source of ${fileName}" href="${url}">Github Source: ${fileName} (line ${line})</a></div>`;
+        link = `<div class="lanying-code-snippet-caption"><a title="Show Full Source of ${fileName}" href="${url}">Github Source: ${fileName} (line ${line})</a></div>`;
     }
     return `<pre><code class="${language}">${entityEncoder.htmlEncode(trimmed)}</code></pre>${link}`
 }
