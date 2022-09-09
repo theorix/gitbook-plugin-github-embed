@@ -16,10 +16,10 @@ import scala.language.postfixOps
    }
 }
 
-def extractCode(className: String, functionName: String, maxLine: String, maxCount: String) = {
+def extractCode(className: String, functionName: String, maxLine: String, maxSnippetCount: String) = {
    var language = cpg.metaData.language.toList(0)
-   var codeCount = 0
-   var maxCountInt = maxCount.toInt
+   var snippetCount = 0
+   var maxSnippetCountInt = maxSnippetCount.toInt
    if (language ==  "JAVASRC") {
       var rule = ".*%s[.:->]*%s[(:]+.*".format(className, functionName)
       cpg.call.methodFullName(rule).foreach(r => {
@@ -30,8 +30,8 @@ def extractCode(className: String, functionName: String, maxLine: String, maxCou
          var lineStart = method.lineNumber
          var lineEnd = method.lineNumberEnd
          var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-         codeCount += 1
-         if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
+         snippetCount += 1
+         if (snippetCount <= maxSnippetCountInt) printResult(filename, lineNumber, code, repoPath)
       })
    } else if (language == "NEWC") {
       if (className == ""){//C++ global function
@@ -44,8 +44,8 @@ def extractCode(className: String, functionName: String, maxLine: String, maxCou
             var lineStart = method.lineNumber
             var lineEnd = method.lineNumberEnd
             var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-            codeCount += 1
-            if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
+            snippetCount += 1
+            if (snippetCount <= maxSnippetCountInt) printResult(filename, lineNumber, code, repoPath)
          })
       } else {//C++ function with class
          var rule = ".*[.:->]+%s$".format(functionName)
@@ -59,8 +59,8 @@ def extractCode(className: String, functionName: String, maxLine: String, maxCou
                var lineStart = method.lineNumber
                var lineEnd = method.lineNumberEnd
                var code = getFileLines(filename, lineStart, lineEnd, lineNumber, maxLine)
-               codeCount += 1
-               if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
+               snippetCount += 1
+               if (snippetCount <= maxSnippetCountInt) printResult(filename, lineNumber, code, repoPath)
             }
          })
       }
@@ -72,8 +72,8 @@ def extractCode(className: String, functionName: String, maxLine: String, maxCou
           var repoPath = project.projectFile.inputPath
           var code = r.inAst.isBlock.toList(0).code
           //var startLineNumber = r.inAst.isBlock.toList(0).lineNumber.get
-         codeCount += 1
-         if (codeCount <= maxCountInt) printResult(filename, lineNumber, code, repoPath)
+         snippetCount += 1
+         if (snippetCount <= maxSnippetCountInt) printResult(filename, lineNumber, code, repoPath)
       })
    }
 }

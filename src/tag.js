@@ -46,7 +46,7 @@ function extractCodeSnippet(options) {
     var isFinish = false
 
     child.stdin.setEncoding('utf-8');
-    child.stdin.write(`ExtractCode ${options.class} ${options.function} ${options.maxLine || 20} ${options.maxCount || 10}\r\n`)
+    child.stdin.write(`ExtractCode ${options.class} ${options.function} ${options.maxLine || 20} ${options.maxSnippetCount || 5}\r\n`)
     child.stdout.on('data', data => {
         lines = data.toString().trim().split('\n')
         lines.forEach(line => {
