@@ -1,3 +1,7 @@
+var processFn = require("./src/tag")
+var initFn = require("./src/init")
+var pageBeforeFn = require("./src/page")
+
 module.exports = {
     // Extend website resources and html
     website: {
@@ -5,14 +9,5 @@ module.exports = {
         css: [
             "lanying-code-snippet.css"
         ]
-    },
-    blocks: {
-        lanying_code_snippet: {
-            process: require('./src/tag')
-        }
-    },
-    hooks: {
-        init: require('./src/init'),
-        "page:before": require('./src/page')
-    },
+    }
 };
